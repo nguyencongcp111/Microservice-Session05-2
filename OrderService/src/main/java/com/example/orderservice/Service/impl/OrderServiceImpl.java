@@ -11,9 +11,12 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -25,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final DiscoveryClient discoveryClient;
     private final RestClient restClient;
+    private final RestTemplate restTemplate;
 
     @Override
     public Order createOrder(OrderRequestDTO dto) {
@@ -70,6 +74,23 @@ public class OrderServiceImpl implements OrderService {
                 });
 
         return response.getData();
+
+    }
+
+    @Override
+    public ProductResponse getProductFromProductService2(Long productId) {
+
+        String targetUrl = "http://ProductService/api/v1/products/" + productId;
+
+        ResponseEntity<DataResponse<ProductResponse>> response =
+                restTemplate.exchange(
+                        targetUrl,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<DataResponse<ProductResponse>>() {}
+                );
+
+        return response.getBody().getData();
 
     }
 }

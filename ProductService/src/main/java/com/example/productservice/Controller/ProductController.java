@@ -6,6 +6,7 @@ import com.example.productservice.Entity.Product;
 import com.example.productservice.Service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
+    @Value("${server.port}")
+    private String port;
+
+
 
     @PostMapping
     public ResponseEntity<DataResponse<Product>> addProduct(
@@ -38,10 +44,13 @@ public class ProductController {
     public ResponseEntity<DataResponse<Product>> getProductById(
             @PathVariable Long id
     ) {
+
+        System.out.println("ProductService chạy tại port: " + port);
+
         return new ResponseEntity<>(
                 new DataResponse<>(
                         true,
-                        "Đã tạo sản phẩm",
+                        "Tìm thấy sản phẩm",
                         productService.getProductById(id),
                         null,
                         LocalDateTime.now()
@@ -51,6 +60,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<DataResponse<List<Product>>> getAllProduct() {
+        System.out.println("ProductService chạy tại port: " + port);
+
         return new ResponseEntity<>(
                 new DataResponse<>(
                         true,

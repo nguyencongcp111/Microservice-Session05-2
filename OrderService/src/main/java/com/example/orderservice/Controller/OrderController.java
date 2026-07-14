@@ -8,6 +8,7 @@ import com.example.orderservice.Service.OrderService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,10 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
     private final OrderService orderService;
+
+    @Value("${server.port}")
+    private String port;
+
 
     @PostMapping
     public ResponseEntity<DataResponse<Order>> createOrder (
@@ -59,6 +64,22 @@ public class OrderController {
                         true,
                         "Tìm thấy sản phẩm",
                         orderService.getProductFromProductService(id),
+                        null,
+                        LocalDateTime.now()
+                ), HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/getProduct2/{id}")
+    public ResponseEntity<DataResponse<ProductResponse>> getProductById(
+            @PathVariable Long id
+    ) {
+
+        return new ResponseEntity<>(
+                new DataResponse<>(
+                        true,
+                        "Tìm thấy sản phẩm",
+                        orderService.getProductFromProductService2(id),
                         null,
                         LocalDateTime.now()
                 ), HttpStatus.OK

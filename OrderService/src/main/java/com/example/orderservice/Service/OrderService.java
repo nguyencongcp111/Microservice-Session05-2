@@ -10,4 +10,7 @@ public interface OrderService {
     Order getOrderById(Long id);
 
     ProductResponse getProductFromProductService(Long productId);
+
+    ProductResponse getProductFromProductService2(Long productId);
+
 }
