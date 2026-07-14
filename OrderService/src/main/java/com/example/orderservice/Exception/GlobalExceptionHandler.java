@@ -7,7 +7,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.naming.ServiceUnavailableException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +48,21 @@ public class GlobalExceptionHandler {
         response.setTimestamp(LocalDateTime.now());
         response.setMessage("Không thể hoàn thành yêu cầu");
         response.setValidationErrors(errors);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiResponseError> handleServiceUnavailable(
+            ResponseStatusException exception
+    ) {
+        Map<String, String> errors = new HashMap<>();
+
+        ApiResponseError response = new ApiResponseError();
+        response.setStatus(HttpStatus.SERVICE_UNAVAILABLE.value());
+        response.setErrors(HttpStatus.SERVICE_UNAVAILABLE.name());
+        response.setTimestamp(LocalDateTime.now());
+        response.setMessage(exception.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

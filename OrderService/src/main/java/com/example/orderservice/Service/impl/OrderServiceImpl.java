@@ -1,19 +1,30 @@
 package com.example.orderservice.Service.impl;
 
 import com.example.orderservice.DTO.Request.OrderRequestDTO;
+import com.example.orderservice.DTO.Response.DataResponse;
+import com.example.orderservice.DTO.Response.ProductResponse;
 import com.example.orderservice.Entity.Order;
 import com.example.orderservice.Exception.ResourceNotFoundException;
 import com.example.orderservice.Repository.OrderRepository;
 import com.example.orderservice.Service.OrderService;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
+    private final DiscoveryClient discoveryClient;
+    private final RestClient restClient;
 
     @Override
     public Order createOrder(OrderRequestDTO dto) {
@@ -33,5 +44,32 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Không tìm thấy sản phẩm ")
         );
+    }
+
+    @Override
+    public ProductResponse getProductFromProductService(Long productId) {
+        List<ServiceInstance> instances = discoveryClient.getInstances("ProductService");
+
+        if (instances.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Product Service hiện không khả dụng (Không tìm thấy service)"
+            );
+        }
+
+        ServiceInstance productInstance = instances.get(0);
+
+        String baseUrl = productInstance.getUri().toString();
+
+        String targetUrl = baseUrl + "/api/v1/products/" + productId;
+
+        DataResponse<ProductResponse> response = restClient.get()
+                .uri(targetUrl)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {
+                });
+
+        return response.getData();
+
     }
 }
