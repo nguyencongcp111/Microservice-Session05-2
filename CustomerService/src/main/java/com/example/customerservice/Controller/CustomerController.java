@@ -6,6 +6,7 @@ import com.example.customerservice.DTO.response.CustomerResponseDTO;
 import com.example.customerservice.DTO.response.DataResponse;
 import com.example.customerservice.Service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+
+    @Value("${server.port}")
+    private String port;
+
 
     @PostMapping("/register")
     public ResponseEntity<DataResponse<CustomerResponseDTO>> register (
@@ -37,6 +42,8 @@ public class CustomerController {
     public ResponseEntity<DataResponse<CustomerResponseDTO>> getCustomerById (
             @PathVariable Long id
     ) {
+        System.out.println("Server đang chạy trên port: " + port);
+
         return new ResponseEntity<>(
                 new DataResponse<>(
                         true,
