@@ -42,8 +42,6 @@ public class CustomerController {
     public ResponseEntity<DataResponse<CustomerResponseDTO>> getCustomerById (
             @PathVariable Long id
     ) {
-        System.out.println("Server đang chạy trên port: " + port);
-
         return new ResponseEntity<>(
                 new DataResponse<>(
                         true,
